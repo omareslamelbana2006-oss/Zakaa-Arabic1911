@@ -1,4 +1,4 @@
-import { supabase, type Lesson, type Exam, type Question, type Attempt, type ChatMessage } from './supabase';
+import { supabase, type Lesson, type Exam, type Question, type Attempt, type ChatMessage, type MotivationalQuote } from './supabase';
 
 // ---------- Lessons ----------
 
@@ -213,4 +213,23 @@ export async function teacherReply(studentId: string, message: string): Promise<
     .from('chat_messages')
     .insert({ student_id: studentId, sender: 'teacher', message });
   if (error) throw error;
+}
+
+// ---------- Motivational Quotes ----------
+
+export async function fetchMotivationalQuotes(): Promise<MotivationalQuote[]> {
+  const { data, error } = await supabase
+    .from('motivational_quotes')
+    .select('*')
+    .eq('is_active', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as MotivationalQuote[];
+}
+
+export async function getRandomMotivationalQuote(): Promise<MotivationalQuote | null> {
+  const quotes = await fetchMotivationalQuotes();
+  if (quotes.length === 0) return null;
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  return quotes[randomIndex];
 }

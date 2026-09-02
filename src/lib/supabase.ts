@@ -66,3 +66,10 @@ export interface ChatMessage {
   message: string;
   created_at: string;
 }
+
+export interface MotivationalQuote {
+  id: string;
+  quote_text: string;
+  is_active: boolean;
+  created_at: string;
+}
