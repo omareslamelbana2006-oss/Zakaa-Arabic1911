@@ -10,7 +10,7 @@ import {
 import type { Exam, Question, Attempt } from '@/lib/supabase';
 
 export default function ExamsScreen({ isTeacher }: { isTeacher: boolean }) {
-  const { user } = useAuth();
+  const { user, darkMode } = useAuth();
   const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -58,8 +58,8 @@ export default function ExamsScreen({ isTeacher }: { isTeacher: boolean }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <ClipboardList className="w-5 h-5 text-blue-600" />
+        <h2 className={`text-lg font-bold flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+          <ClipboardList className={`w-5 h-5 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
           الامتحانات
         </h2>
         {isTeacher && (
@@ -70,33 +70,33 @@ export default function ExamsScreen({ isTeacher }: { isTeacher: boolean }) {
         )}
       </div>
 
-      {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+      {error && <p className={`text-sm mb-3 ${darkMode ? 'text-red-400' : 'text-red-500'}`}>{error}</p>}
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="w-7 h-7 animate-spin text-blue-500" /></div>
+        <div className="flex justify-center py-12"><Loader2 className={`w-7 h-7 animate-spin ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} /></div>
       ) : exams.length === 0 ? (
-        <div className="flex flex-col items-center py-12 text-slate-400">
+        <div className={`flex flex-col items-center py-12 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
           <ClipboardList className="w-12 h-12 mb-2 opacity-50" />
           <p className="text-sm">لا توجد امتحانات بعد</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {exams.map((exam) => (
-            <ExamCard key={exam.id} exam={exam} isTeacher={isTeacher} studentId={user?.id} onOpen={() => setActiveExam(exam)} onDelete={() => handleDelete(exam.id)} />
+            <ExamCard key={exam.id} exam={exam} isTeacher={isTeacher} studentId={user?.id} onOpen={() => setActiveExam(exam)} onDelete={() => handleDelete(exam.id)} darkMode={darkMode} />
           ))}
         </div>
       )}
 
       {showCreate && (
-        <Modal onClose={() => setShowCreate(false)} title="إنشاء امتحان جديد">
+        <Modal onClose={() => setShowCreate(false)} title="إنشاء امتحان جديد" darkMode={darkMode}>
           <div className="space-y-3">
             <div>
-              <label className="text-sm font-medium text-slate-600 mb-1 block">عنوان الامتحان</label>
-              <input type="text" value={examTitle} onChange={(e) => setExamTitle(e.target.value)} className="input-field" placeholder="عنوان الامتحان" />
+              <label className={`text-sm font-medium mb-1 block ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>عنوان الامتحان</label>
+              <input type="text" value={examTitle} onChange={(e) => setExamTitle(e.target.value)} className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' : ''}`} placeholder="عنوان الامتحان" />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-600 mb-1 block">الوصف (اختياري)</label>
-              <textarea value={examDesc} onChange={(e) => setExamDesc(e.target.value)} className="input-field min-h-[80px] resize-y" placeholder="وصف الامتحان" />
+              <label className={`text-sm font-medium mb-1 block ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>الوصف (اختياري)</label>
+              <textarea value={examDesc} onChange={(e) => setExamDesc(e.target.value)} className={`input-field min-h-[80px] resize-y ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400' : ''}`} placeholder="وصف الامتحان" />
             </div>
             <button onClick={handleCreate} disabled={submitting} className="btn-primary">
               {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'إنشاء'}
@@ -110,7 +110,7 @@ export default function ExamsScreen({ isTeacher }: { isTeacher: boolean }) {
 
 // ---- Exam Card ----
 
-function ExamCard({ exam, isTeacher, studentId, onOpen, onDelete }: { exam: Exam; isTeacher: boolean; studentId?: string; onOpen: () => void; onDelete: () => void }) {
+function ExamCard({ exam, isTeacher, studentId, onOpen, onDelete, darkMode }: { exam: Exam; isTeacher: boolean; studentId?: string; onOpen: () => void; onDelete: () => void; darkMode: boolean }) {
   const [attempt, setAttempt] = useState<Attempt | null | undefined>(undefined);
 
   useEffect(() => {
@@ -120,26 +120,26 @@ function ExamCard({ exam, isTeacher, studentId, onOpen, onDelete }: { exam: Exam
   }, [exam.id, studentId, isTeacher]);
 
   return (
-    <div className="card p-5">
+    <div className={`card p-5 ${darkMode ? 'bg-slate-800 border-slate-700' : ''}`}>
       <div className="flex items-start justify-between mb-2">
-        <h3 className="font-bold text-slate-800">{exam.title}</h3>
+        <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>{exam.title}</h3>
         {isTeacher && (
-          <button onClick={onDelete} className="text-red-400 hover:text-red-600 p-1">
+          <button onClick={onDelete} className={`p-1 ${darkMode ? 'text-red-400 hover:text-red-300' : 'text-red-400 hover:text-red-600'}`}>
             <Trash2 className="w-4 h-4" />
           </button>
         )}
       </div>
-      {exam.description && <p className="text-sm text-slate-500 mb-3">{exam.description}</p>}
+      {exam.description && <p className={`text-sm mb-3 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{exam.description}</p>}
       {!isTeacher && attempt !== undefined && (
         attempt ? (
           <div className="flex items-center gap-2 text-sm mb-3">
-            <span className={`px-2.5 py-1 rounded-full font-semibold ${attempt.percentage >= 90 ? 'bg-green-50 text-green-600' : attempt.percentage >= 50 ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'}`}>
+            <span className={`px-2.5 py-1 rounded-full font-semibold ${attempt.percentage >= 90 ? (darkMode ? 'bg-green-900/50 text-green-400' : 'bg-green-50 text-green-600') : attempt.percentage >= 50 ? (darkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-50 text-amber-600') : (darkMode ? 'bg-red-900/50 text-red-400' : 'bg-red-50 text-red-600')}`}>
               {attempt.percentage}%
             </span>
-            <span className="text-slate-400 text-xs">تم أداء الامتحان</span>
+            <span className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>تم أداء الامتحان</span>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 text-sm text-blue-600 mb-3">
+          <div className={`flex items-center gap-1.5 text-sm mb-3 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
             <Lock className="w-3.5 h-3.5" />
             <span className="text-xs">لم تؤدِ هذا الامتحان بعد</span>
           </div>

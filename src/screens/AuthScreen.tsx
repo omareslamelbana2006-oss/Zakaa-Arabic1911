@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { GraduationCap, User, UserPlus, LogIn, Phone, Lock, BookOpen, Loader2, AlertCircle, ShieldCheck, Camera, X } from 'lucide-react';
+import { GraduationCap, User, UserPlus, LogIn, Phone, Lock, BookOpen, Loader2, AlertCircle, ShieldCheck, Camera, X, Moon, Sun } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { signUpStudent, signUpTeacher, signIn, teacherExists, uploadAvatar } from '@/lib/auth';
 import type { Role } from '@/lib/supabase';
@@ -19,7 +19,7 @@ const GRADES = [
 type Mode = 'login' | 'register';
 
 export default function AuthScreen() {
-  const { login } = useAuth();
+  const { login, darkMode, toggleDarkMode } = useAuth();
   const [mode, setMode] = useState<Mode>('login');
   const [role, setRole] = useState<Role>('student');
   const [teacherLocked, setTeacherLocked] = useState(false);
@@ -136,27 +136,37 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-blue-100 flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors duration-300 ${darkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900'}`}>
       <div className="w-full max-w-md">
+        {/* Dark Mode Toggle */}
+        <div className="flex justify-end mb-4">
+          <button 
+            onClick={toggleDarkMode}
+            className={`p-3 rounded-full transition-all duration-300 ${darkMode ? 'bg-slate-700 text-yellow-400 hover:bg-slate-600' : 'bg-white/20 text-white hover:bg-white/30'}`}
+          >
+            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-lg shadow-blue-600/30 mb-4">
-            <GraduationCap className="w-9 h-9 text-white" />
+          <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl shadow-lg mb-4 ${darkMode ? 'bg-gradient-to-br from-blue-500 to-blue-700 shadow-blue-500/30' : 'bg-gradient-to-br from-white to-blue-100 shadow-white/30'}`}>
+            <GraduationCap className={`w-9 h-9 ${darkMode ? 'text-white' : 'text-blue-600'}`} />
           </div>
-          <h1 className="text-3xl font-bold text-slate-800 mb-1">ذكاء بالعربي</h1>
-          <p className="text-slate-500 text-sm">منصة تعليمية بسيطة وسريعة</p>
+          <h1 className={`text-3xl font-bold mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>ذكاء بالعربي</h1>
+          <p className={`text-sm ${darkMode ? 'text-slate-300' : 'text-blue-100'}`}>منصة تعليمية بسيطة وسريعة</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-blue-200/60 border border-slate-100 overflow-hidden">
+        <div className={`rounded-2xl shadow-xl overflow-hidden transition-colors duration-300 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'}`}>
           {/* Tabs */}
-          <div className="flex border-b border-slate-100">
+          <div className={`flex border-b ${darkMode ? 'border-slate-700' : 'border-slate-100'}`}>
             <button
               onClick={() => switchMode('login')}
               className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors ${
                 mode === 'login'
-                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? darkMode ? 'text-blue-400 border-b-2 border-blue-400 bg-slate-700/50' : 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+                  : darkMode ? 'text-slate-400 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
               }`}
             >
               <LogIn className="w-4 h-4" />
@@ -166,8 +176,8 @@ export default function AuthScreen() {
               onClick={() => switchMode('register')}
               className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors ${
                 mode === 'register'
-                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
-                  : 'text-slate-400 hover:text-slate-600'
+                  ? darkMode ? 'text-blue-400 border-b-2 border-blue-400 bg-slate-700/50' : 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50'
+                  : darkMode ? 'text-slate-400 hover:text-slate-300' : 'text-slate-400 hover:text-slate-600'
               }`}
             >
               <UserPlus className="w-4 h-4" />
@@ -177,7 +187,7 @@ export default function AuthScreen() {
 
           <div className="p-6">
             {error && (
-              <div className="mb-4 flex items-start gap-2 bg-red-50 text-red-600 text-sm rounded-lg px-3 py-2.5 border border-red-100">
+              <div className={`mb-4 flex items-start gap-2 text-sm rounded-lg px-3 py-2.5 border ${darkMode ? 'bg-red-900/30 text-red-400 border-red-800' : 'bg-red-50 text-red-600 border-red-100'}`}>
                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
@@ -185,13 +195,13 @@ export default function AuthScreen() {
 
             {mode === 'login' ? (
               <div className="space-y-4">
-                <Field icon={<Phone className="w-4 h-4" />} label="رقم الهاتف">
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05xxxxxxxx" className="input-field" onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
+                <Field icon={<Phone className="w-4 h-4" />} label="رقم الهاتف" darkMode={darkMode}>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05xxxxxxxx" className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                 </Field>
-                <Field icon={<Lock className="w-4 h-4" />} label="كلمة المرور">
-                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="input-field" onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
+                <Field icon={<Lock className="w-4 h-4" />} label="كلمة المرور" darkMode={darkMode}>
+                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
                 </Field>
-                <button onClick={handleLogin} disabled={loading} className="btn-primary">
+                <button onClick={handleLogin} disabled={loading} className={`btn-primary ${darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}>
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'دخول'}
                 </button>
               </div>
@@ -199,8 +209,8 @@ export default function AuthScreen() {
               <div className="space-y-4">
                 {/* Role selector */}
                 <div className="grid grid-cols-2 gap-3">
-                  <RoleButton active={role === 'student'} onClick={() => { setRole('student'); resetFields(); }} icon={<User className="w-5 h-5" />} label="طالب" />
-                  <RoleButton active={role === 'teacher'} onClick={() => { setRole('teacher'); resetFields(); }} icon={<ShieldCheck className="w-5 h-5" />} label="معلم" disabled={teacherLocked} locked={teacherLocked} />
+                  <RoleButton active={role === 'student'} onClick={() => { setRole('student'); resetFields(); }} icon={<User className="w-5 h-5" />} label="طالب" darkMode={darkMode} />
+                  <RoleButton active={role === 'teacher'} onClick={() => { setRole('teacher'); resetFields(); }} icon={<ShieldCheck className="w-5 h-5" />} label="معلم" disabled={teacherLocked} locked={teacherLocked} darkMode={darkMode} />
                 </div>
 
                 {/* Avatar upload (student only) */}
@@ -209,13 +219,13 @@ export default function AuthScreen() {
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
                     {avatarPreview ? (
                       <div className="relative">
-                        <img src={avatarPreview} alt="معاينة" className="w-20 h-20 rounded-full object-cover border-2 border-blue-200" />
+                        <img src={avatarPreview} alt="معاينة" className={`w-20 h-20 rounded-full object-cover border-2 ${darkMode ? 'border-slate-600' : 'border-blue-200'}`} />
                         <button onClick={removeAvatar} className="absolute -top-1 -left-1 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ) : (
-                      <button onClick={() => fileInputRef.current?.click()} className="w-20 h-20 rounded-full bg-blue-50 border-2 border-dashed border-blue-300 flex flex-col items-center justify-center text-blue-400 hover:bg-blue-100 transition-colors">
+                      <button onClick={() => fileInputRef.current?.click()} className={`w-20 h-20 rounded-full border-2 border-dashed flex flex-col items-center justify-center transition-colors ${darkMode ? 'bg-slate-700 border-slate-600 text-slate-400 hover:bg-slate-600' : 'bg-blue-50 border-blue-300 text-blue-400 hover:bg-blue-100'}`}>
                         <Camera className="w-6 h-6 mb-1" />
                         <span className="text-[10px]">الصورة الشخصية</span>
                       </button>
@@ -223,28 +233,28 @@ export default function AuthScreen() {
                   </div>
                 )}
 
-                <Field icon={<User className="w-4 h-4" />} label="الاسم">
-                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={role === 'student' ? 'الاسم الثلاثي' : 'الاسم'} className="input-field" />
+                <Field icon={<User className="w-4 h-4" />} label="الاسم" darkMode={darkMode}>
+                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={role === 'student' ? 'الاسم الثلاثي' : 'الاسم'} className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} />
                 </Field>
-                <Field icon={<Phone className="w-4 h-4" />} label="رقم الهاتف">
-                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05xxxxxxxx" className="input-field" />
+                <Field icon={<Phone className="w-4 h-4" />} label="رقم الهاتف" darkMode={darkMode}>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="05xxxxxxxx" className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} />
                 </Field>
                 {role === 'student' && (
                   <>
-                    <Field icon={<Phone className="w-4 h-4" />} label="رقم هاتف ولي الأمر">
-                      <input type="tel" value={guardianPhone} onChange={(e) => setGuardianPhone(e.target.value)} placeholder="05xxxxxxxx" className="input-field" />
+                    <Field icon={<Phone className="w-4 h-4" />} label="رقم هاتف ولي الأمر" darkMode={darkMode}>
+                      <input type="tel" value={guardianPhone} onChange={(e) => setGuardianPhone(e.target.value)} placeholder="05xxxxxxxx" className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} />
                     </Field>
-                    <Field icon={<BookOpen className="w-4 h-4" />} label="الصف الدراسي">
-                      <select value={grade} onChange={(e) => setGrade(e.target.value)} className="input-field">
+                    <Field icon={<BookOpen className="w-4 h-4" />} label="الصف الدراسي" darkMode={darkMode}>
+                      <select value={grade} onChange={(e) => setGrade(e.target.value)} className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white focus:border-blue-500' : ''}`}>
                         {GRADES.map((g) => (<option key={g} value={g}>{g}</option>))}
                       </select>
                     </Field>
                   </>
                 )}
-                <Field icon={<Lock className="w-4 h-4" />} label="كلمة المرور">
-                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="input-field" />
+                <Field icon={<Lock className="w-4 h-4" />} label="كلمة المرور" darkMode={darkMode}>
+                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className={`input-field ${darkMode ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500' : ''}`} />
                 </Field>
-                <button onClick={handleRegister} disabled={loading || (role === 'teacher' && teacherLocked)} className="btn-primary">
+                <button onClick={handleRegister} disabled={loading || (role === 'teacher' && teacherLocked)} className={`btn-primary ${darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : ''}`}>
                   {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'إنشاء حساب'}
                 </button>
               </div>
@@ -252,17 +262,17 @@ export default function AuthScreen() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-6">منصة ذكاء بالعربي التعليمية</p>
+        <p className={`text-center text-xs mt-6 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>منصة ذكاء بالعربي التعليمية</p>
       </div>
     </div>
   );
 }
 
-function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function Field({ icon, label, children, darkMode }: { icon: React.ReactNode; label: string; children: React.ReactNode; darkMode: boolean }) {
   return (
     <div>
-      <label className="flex items-center gap-1.5 text-sm font-medium text-slate-600 mb-1.5">
-        <span className="text-blue-500">{icon}</span>
+      <label className={`flex items-center gap-1.5 text-sm font-medium mb-1.5 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+        <span className={darkMode ? 'text-blue-400' : 'text-blue-500'}>{icon}</span>
         {label}
       </label>
       {children}
@@ -270,12 +280,12 @@ function Field({ icon, label, children }: { icon: React.ReactNode; label: string
   );
 }
 
-function RoleButton({ active, onClick, icon, label, disabled, locked }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; disabled?: boolean; locked?: boolean; }) {
+function RoleButton({ active, onClick, icon, label, disabled, locked, darkMode }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string; disabled?: boolean; locked?: boolean; darkMode: boolean }) {
   return (
-    <button onClick={onClick} disabled={disabled} className={`relative flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all ${active ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-400 hover:border-slate-300'} ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+    <button onClick={onClick} disabled={disabled} className={`relative flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all ${active ? (darkMode ? 'border-blue-500 bg-slate-700 text-blue-400' : 'border-blue-600 bg-blue-50 text-blue-700') : (darkMode ? 'border-slate-600 bg-slate-800 text-slate-400 hover:border-slate-500' : 'border-slate-200 bg-white text-slate-400 hover:border-slate-300')} ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
       {icon}
       <span className="text-sm font-semibold">{label}</span>
-      {locked && (<span className="absolute -top-2 left-2 text-[10px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full font-medium">محجوز</span>)}
+      {locked && (<span className={`absolute -top-2 left-2 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${darkMode ? 'bg-amber-900/50 text-amber-400' : 'bg-amber-100 text-amber-600'}`}>محجوز</span>)}
     </button>
   );
 }
